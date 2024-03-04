@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <pthread.h>
+#define ITERATIONS 10000
+int shared_variable = 0;
+pthread_mutex_t mutex;
+void *incrementFunction(void *arg) {
+    for (int i = 0; i < ITERATIONS; i++) {
+        pthread_mutex_lock(&mutex);
+        shared_variable++;
+        pthread_mutex_unlock(&mutex);
+    }
+    pthread_exit(NULL);
+}
+int main() {
+    pthread_t thread1, thread2;
+    pthread_mutex_init(&mutex, NULL);
+    pthread_create(&thread1, NULL, incrementFunction, NULL);
+    pthread_create(&thread2, NULL, incrementFunction, NULL);
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    pthread_mutex_destroy(&mutex);
+    printf("Final value of the shared variable: %d\n", shared_variable);
+    return 0;
+}
