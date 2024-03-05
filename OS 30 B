@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+void *threadFunction(void *arg) {
+    printf("Thread created successfully!\n");
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t thread;
+
+    if (pthread_create(&thread, NULL, threadFunction, NULL) != 0) {
+        perror("Error creating thread");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pthread_join(thread, NULL) != 0) {
+        perror("Error joining thread");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Thread joined successfully!\n");
+
+    return 0;
+}
