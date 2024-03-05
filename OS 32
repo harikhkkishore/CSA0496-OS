@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_FRAMES 3 
+int isPagePresent(int page, int frames[], int n) {
+    for (int i = 0; i < n; i++) {
+        if (frames[i] == page) {
+            return 1;
+        }
+    }
+    return 0;
+}
+int findLRUIndex(int accessCount[], int n) {
+    int minIndex = 0;
+    for (int i = 1; i < n; i++) {
+        if (accessCount[i] < accessCount[minIndex]) {
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+void displayMemory(int frames[], int n) {
+    printf("Memory contents: ");
+    for (int i = 0; i < n; i++) {
+        if (frames[i] == -1) {
+            printf("Empty ");
+        } else {
+            printf("%d ", frames[i]);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int pages[] = {1, 3, 0, 3, 5, 6, 3}; 
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frames[MAX_FRAMES]; 
+    int accessCount[MAX_FRAMES]; 
+    int page_faults = 0; 
+    for (int i = 0; i < MAX_FRAMES; i++) {
+        frames[i] = -1;
+        accessCount[i] = 0;
+    }
+    for (int i = 0; i < n; i++) {
+        if (!isPagePresent(pages[i], frames, MAX_FRAMES)) {
+            int lruIndex = findLRUIndex(accessCount, MAX_FRAMES);
+            frames[lruIndex] = pages[i];
+            accessCount[lruIndex] = 0; 
+            page_faults++;
+        }
+        for (int j = 0; j < MAX_FRAMES; j++) {
+            accessCount[j]++;
+        }
+        for (int j = 0; j < MAX_FRAMES; j++) {
+            if (frames[j] == pages[i]) {
+                accessCount[j] = 0;
+                break;
+            }
+        }
+        printf("Page request: %d, ", pages[i]);
+        displayMemory(frames, MAX_FRAMES);
+    }
+
+    printf("\nTotal page faults: %d\n", page_faults);
+
+    return 0;
+}
