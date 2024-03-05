@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MEMORY_SIZE 1000
+struct Node {
+    int size;
+    int allocated;
+    struct Node* next;
+};
+struct Node* memory;
+void initialize_memory() {
+    memory = (struct Node*)malloc(sizeof(struct Node));
+    memory->size = MEMORY_SIZE;
+    memory->allocated = 0;
+    memory->next = NULL;
+}
+void display_memory() {
+    struct Node* current = memory;
+    printf("Memory Status:\n");
+    while (current != NULL) {
+        printf("Size: %d, Allocated: %s\n", current->size, current->allocated ? "Yes" : "No");
+        current = current->next;
+    }
+    printf("\n");
+}
+void allocate_memory(int size) {
+    struct Node* current = memory;
+    struct Node* best_fit = NULL;
+    int min_free_size = MEMORY_SIZE + 1;
+    while (current != NULL) {
+        if (!current->allocated && current->size >= size && current->size < min_free_size) {
+            min_free_size = current->size;
+            best_fit = current;
+        }
+        current = current->next;
+    }
+
+    if (best_fit == NULL) {
+        printf("Error: Not enough memory available for allocation.\n");
+        return;
+    }
+    if (best_fit->size > size) {
+        struct Node* new_block = (struct Node*)malloc(sizeof(struct Node));
+        new_block->size = best_fit->size - size;
+        new_block->allocated = 0;
+        new_block->next = best_fit->next;
+        best_fit->next = new_block;
+    }
+    best_fit->size = size;
+    best_fit->allocated = 1;
+
+    printf("Memory allocated successfully.\n");
+}
+void deallocate_memory() {
+    struct Node* current = memory;
+    while (current != NULL) {
+        current->allocated = 0; 
+        current = current->next;
+    }
+    printf("Memory deallocated successfully.\n");
+}
+
+int main() {
+    initialize_memory();
+    display_memory();
+
+    allocate_memory(200);
+    display_memory();
+
+    allocate_memory(300);
+    display_memory();
+
+    deallocate_memory();
+    display_memory();
+
+    return 0;
+}
